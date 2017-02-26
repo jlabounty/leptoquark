@@ -1,29 +1,4 @@
-#include "TROOT.h"
-#include "TClass.h"
-#include "TGraph.h"
-#include "TF1.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TH3F.h"
-#include "TH3D.h"
-#include "TTree.h"
-#include "TCanvas.h"
-#include "TBranch.h"
-#include "Riostream.h"
-#include "TStyle.h"
-#include "TFile.h"
-#include "TString.h"
-#include "TLegend.h"
-#include "TRandom3.h"
-#include "TMath.h"
-#include "math.h"
-#include "TColor.h"
-#include <vector>
-#include <sstream>
-#include <algorithm>
-
 #include <cstdlib>
-#include "TMath.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -37,7 +12,7 @@ using namespace std;
 //AVERAGE
 double Average(vector<double> v)
 {      double sum=0;
-       for(int i=0;(unsigned)i<v.size();i++)
+       for(int i=0;i<v.size();i++)
                sum+=v[i];
        return sum/v.size();
 }
@@ -45,12 +20,12 @@ double Average(vector<double> v)
 double Deviation(vector<double> v, double ave)
 {
        double E=0;
-       for(int i=0;(unsigned)i<v.size();i++)
+       for(int i=0;i<v.size();i++)
                E+=(v[i] - ave)*(v[i] - ave);
        return sqrt(1/static_cast<double>(v.size())*E);
 }
 
-int Lepto_test()
+int Lepto_test_2()
 {
 
 	int I, KS, KF, ORIG;
@@ -63,21 +38,21 @@ int Lepto_test()
 	vector<double> v_trans;
 	vector<int> v_event;
 
-//	std::ifstream file("TestOut_1000Events.txt");
+	std::ifstream file("TestOut_1000Events.txt");
 //	std::ifstream file("TestOut_10_250_LQ13.txt"); //Full number of events!
 //	std::ifstream file("TestOut_10_250.txt"); //Full number of events!
-	std::ifstream file("TestOut_20_250.txt"); //Full number of events!
+//	std::ifstream file("TestOut_20_250.txt"); //Full number of events!
 //	std::ifstream file("TestOut_20_325.txt"); //Full number of events!
 	std::string str;
 
-//        int tau_orig = 0;
-//        int non_daughter = 0;
-//        int daughter = 0;
-//        int mother = 0;
-//        int high_eta = 0;
+        int tau_orig = 0;
+        int non_daughter = 0;
+        int daughter = 0;
+        int mother = 0;
+        int high_eta = 0;
         int I_old = 1000, I_new, event_total;
         int neg_eta = 0;
-//        int problem_eta = 0;
+        int problem_eta = 0;
 
         int line = 0;
 
@@ -91,7 +66,7 @@ int Lepto_test()
 			if(I_new < I_old) event_total++;
 			I_old = I_new;
 
-			mom = sqrt(pow(px,2) + pow(px,2) + pow(pz,2));
+			mom = sqrt(pow(px,2) + pow(py,2) + pow(pz,2));
 			trans = sqrt(pow(px,2) + pow(py,2));
 			eta = (0.5)*log((mom+trans)/(mom-trans));
 			if(pz < 0)
@@ -132,7 +107,7 @@ int Lepto_test()
 
 	cout << "Size: " << v_event.size() << endl;
 
-	for(int i = 0; (unsigned)i < v_event.size(); i++) 				//loop over all entries in the list
+	for(int i = 0; i < v_event.size(); i++) 				//loop over all entries in the list
 	{
 		for(int j = 0; j < event_total; j++)				//loop over all events
 		{
@@ -146,7 +121,7 @@ int Lepto_test()
 						v_daughters_I.push_back(mother_tau);
 						v_daughters_line.push_back(i);
 					}
-						for(int l = 0; (unsigned)l < v_daughters_I.size(); l++)
+						for(int l = 0; l < v_daughters_I.size(); l++)
 						{
 							if(v_ORIG[i] == v_daughters_I[l]) daughter_check = true;
 						}
@@ -175,9 +150,9 @@ int Lepto_test()
 	vector<double> v_d_trans;
 	vector<int> v_d_event;
 
-	for(int i = 0; (unsigned)i < v_I.size(); i++)
+	for(int i = 0; i < v_I.size(); i++)
 	{
-		for(int j = 0; (unsigned)j < v_daughters_line.size(); j++)
+		for(int j = 0; j < v_daughters_line.size(); j++)
 		{
 			if(i == v_daughters_line[j])
 			{
@@ -210,7 +185,7 @@ int Lepto_test()
 	double avg_eta, avg_phi, stdev_eta, stdev_phi;
 	vector<double> v_oneevent_eta, v_oneevent_phi;
 
-	for(int i = 0; (unsigned)i < v_d_I.size(); i++)
+	for(int i = 0; i < v_d_I.size(); i++)
 	{
 		for (int j = 0; j < number_of_events - 1; j++)
 		{
@@ -244,8 +219,8 @@ int Lepto_test()
 	gStyle->SetStatH(0.2);
 
 	TCanvas *c1 = new TCanvas();
-	TH2F *h  = new TH2F("h","#delta #eta vs. #delta #phi",60,0,3,80,0,4);
-	for(int i = 0; (unsigned)i < v_delta_eta.size(); i++)
+	TH2F *h  = new TH2F("h","#delta #eta vs. #delta #phi",160,-8,8,80,-4,4);
+	for(int i = 0; i < v_delta_eta.size(); i++)
 	{
 		h->Fill(v_delta_eta[i],v_delta_phi[i]);
 	}

@@ -66,8 +66,9 @@ int Lepto_test()
 //	std::ifstream file("TestOut_1000Events.txt");
 //	std::ifstream file("TestOut_10_250_LQ13.txt"); //Full number of events!
 //	std::ifstream file("TestOut_10_250.txt"); //Full number of events!
-	std::ifstream file("TestOut_20_250.txt"); //Full number of events!
+//	std::ifstream file("../LQmass_1936-5_q1_q1/LQGENEP_10_250_10000.txt"); //Full number of events!
 //	std::ifstream file("TestOut_20_325.txt"); //Full number of events!
+	std::ifstream file("../TestOut.txt"); //Full number of events!
 	std::string str;
 
 //        int tau_orig = 0;
@@ -255,6 +256,7 @@ int Lepto_test()
 	h->Draw("COLZ");
 	c1->SetRightMargin(0.13);
 	c1->Print("DeltaEta_vs_DeltaPhi.eps");
+	c1->Print("DeltaEta_vs_DeltaPhi.root");
 
 
 

@@ -62,7 +62,7 @@ int Lepto()
 	vector<double> v_21_orig;
 	vector<int> v_21_I;
 
-	std::ifstream file("TestOut_1000Events.txt");
+	std::ifstream file("../../TestOut.txt");
 //	std::ifstream file("TestOut_10_250_LQ13.txt"); //Full number of events!
 //	std::ifstream file("TestOut_10_250.txt"); //Full number of events!
 //	std::ifstream file("TestOut_20_250.txt"); //Full number of events!
@@ -94,8 +94,8 @@ int Lepto()
 			if((KS != 21) && (KF == 15) && (ORIG == 8))
 			{
 				//Calculate the total momentum, transverse momentum, and eta
-				mom = sqrt(px**2 + py**2 + pz**2);
-				trans = sqrt(px**2 + py**2);
+				mom = sqrt(pow(px,2) + pow(py,2) + pow(pz,2));
+				trans = sqrt(pow(px,2) + pow(py,2));
 				eta = (0.5)*log((mom+trans)/(mom-trans));
 				if(pz < 0)
 				{
@@ -132,7 +132,7 @@ int Lepto()
 			{
 				v_d_event.push_back(event_total);
 
-				mom = sqrt(px**2 + py**2 + pz**2);
+				mom = sqrt(pow(px,2) + pow(py,2) + pow(pz,2));
 				if((KF == 12) || (KF == 14) || (KF == 16) || (KF == 18))
 				{
 					trans = 0.000000;
@@ -140,7 +140,7 @@ int Lepto()
 				}
 				else
 				{
-					trans = sqrt(px**2 + py**2);
+					trans = sqrt(pow(px,2) + pow(py,2));
 				}
 				eta = (0.5)*log((mom+trans)/(mom-trans));
 				if(pz < 0)
@@ -171,8 +171,8 @@ int Lepto()
 
 				v_21_event.push_back(event_total);
 
-				mom = sqrt(px**2 + py**2 + pz**2);
-				trans = sqrt(px**2 + py**2);
+				mom = sqrt(pow(px,2) + pow(py,2) + pow(pz,2));
+				trans = sqrt(pow(px,2) + pow(py,2));
 				eta = (0.5)*log((mom+trans)/(mom-trans));
 				if(pz < 0)
 				{
@@ -222,8 +222,8 @@ int Lepto()
 
 		if(event_count > last_count)
 		{
-			pt_orig.push_back(TMath::Sqrt((pxSUM_orig)**2 + (pySUM_orig)**2));
-			pt_miss.push_back(TMath::Sqrt((pxSUM)**2 + (pySUM)**2));
+			pt_orig.push_back(TMath::Sqrt(pow((pxSUM_orig),2) + pow((pySUM_orig),2)));
+			pt_miss.push_back(TMath::Sqrt(pow((pxSUM),2) + pow((pySUM),2)));
 			pxSUM = pySUM = pxSUM_orig = pySUM_orig = 0;
 			last_count++;
 		}

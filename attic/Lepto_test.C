@@ -63,11 +63,12 @@ int Lepto_test()
 	vector<double> v_trans;
 	vector<int> v_event;
 
-//	std::ifstream file("../TestOut_1000Events.txt");
+//	std::ifstream file("TestOut_1000Events.txt");
 //	std::ifstream file("TestOut_10_250_LQ13.txt"); //Full number of events!
-//	std::ifstream file("../TestOut_10_250.txt"); //Full number of events!
-	std::ifstream file("../TestOut_20_250.txt"); //Full number of events!
+//	std::ifstream file("TestOut_10_250.txt"); //Full number of events!
+//	std::ifstream file("../LQmass_1936-5_q1_q1/LQGENEP_10_250_10000.txt"); //Full number of events!
 //	std::ifstream file("TestOut_20_325.txt"); //Full number of events!
+	std::ifstream file("../TestOut.txt"); //Full number of events!
 	std::string str;
 
 //        int tau_orig = 0;
@@ -255,56 +256,8 @@ int Lepto_test()
 	h->Draw("COLZ");
 	c1->SetRightMargin(0.13);
 	c1->Print("DeltaEta_vs_DeltaPhi.eps");
+	c1->Print("DeltaEta_vs_DeltaPhi.root");
 
-
-	//compute difference in eta, difference in phi for each shower
-	vector<double> v_diff_eta, v_diff_phi;
-	v_oneevent_eta.clear();
-	v_oneevent_phi.clear();
-	Iold = Inew = 0;	
-	N = 0;
-	double tau_eta, tau_phi/*, diff_eta, diff_phi*/;
-	for(int i = 0; (unsigned)i < v_d_I.size(); i++)
-	{
-		Inew = v_d_I[i];
-		if(Inew < Iold)
-		{
-			tau_eta = v_oneevent_eta[0];
-			tau_phi = v_oneevent_phi[0];
-			
-			for(int counter = 1; (unsigned)counter < v_oneevent_eta.size(); counter++)
-			{
-				v_diff_eta.push_back(v_oneevent_eta[counter] -tau_eta);
-				v_diff_phi.push_back(v_oneevent_phi[counter] -tau_phi);
-			}
-
-			v_oneevent_eta.clear();
-			v_oneevent_phi.clear();
-		}
-		Iold = Inew;
-		for (int j = 0; j < number_of_events - 1; j++)
-		{
-			if(v_d_event[i] == j)
-			{
-				N++;
-				v_oneevent_eta.push_back(v_d_eta[i]);
-				v_oneevent_phi.push_back(v_d_phi[i]);
-			}
-		}
-	}
-
-	TCanvas *c2 = new TCanvas();
-	TH2F *h2  = new TH2F("h2","#Delta #eta vs. #Delta #phi",160,-1,1,160,-1,1);
-	for(int i = 0; (unsigned)i < v_diff_eta.size(); i++)
-	{
-		h2->Fill(v_diff_eta[i],v_diff_phi[i]);
-	}
-	h2->SetTitle("#eta vs. #phi of Tau Distribution from e-p Leptoquark Events");
-	h2->GetXaxis()->SetTitle("#delta #eta");
-	h2->GetYaxis()->SetTitle("#delta #phi");
-	h2->Draw("COLZ");
-	c2->SetRightMargin(0.13);
-	c2->Print("DiffEta_vs_DiffPhi.eps");
 
 
 	return 0;

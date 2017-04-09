@@ -240,10 +240,23 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 
 	TCanvas *c2 = new TCanvas();
 
-	TTree *t2 = new TTree("tvec","tree with vectors");
-	t2->Branch("eta",&v_d_DiffEta);
-	t2->Branch("phi",&v_d_DiffPhi);
-	t2->Branch("energy",&v_d_E);
+	TTree *t2 = new TTree("tvec","Tree with vectors of tau daughter particles");
+		t2->Branch("eta",&v_d_DiffEta);
+		t2->Branch("phi",&v_d_DiffPhi);
+		t2->Branch("energy",&v_d_E);
+		t2->Branch("I",&v_d_I);
+		t2->Branch("KS",&v_d_KS);
+		t2->Branch("KF",&v_d_KF);
+		t2->Branch("ORIG",&v_d_ORIG);
+		t2->Branch("event",&v_d_event);
+		t2->Branch("momentum",&v_d_mom);
+		t2->Branch("eta",&v_d_eta);
+		t2->Branch("phi",&v_d_phi);
+		t2->Branch("px",&v_d_px);
+		t2->Branch("py",&v_d_py);
+		t2->Branch("pz",&v_d_pz);
+		t2->Branch("mass",&v_d_m);
+		t2->Branch("pTrans",&v_d_trans);
 	t2->Fill();	
 
 	TH2F *h2  = new TH2F("h2","#Delta#eta vs. #Delta#phi",120,-1.5,1.5,120,-1.5,1.5);

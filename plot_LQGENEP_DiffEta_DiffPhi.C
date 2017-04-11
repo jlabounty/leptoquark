@@ -56,22 +56,23 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 
 	gStyle->SetOptStat(0);
 
-	std::string inputFile = "./outdir/TestOut.10000event.root";
+	std::string inputFile = "./outdir/TestOut.14000event.root";
 //	std::string inputFile = "./outdir/TestOut.100event.root";
 	TFile *f = TFile::Open(inputFile.c_str());
 	TTree *t = (TTree*)f->Get("EICTree");
 
-	vector<int> v_I, v_KS, v_KF, v_ORIG;
-	vector<double> v_phi, v_eta, v_mom;
-	vector<double> v_px, v_py, v_pz, v_E, v_m;
-	vector<double> v_trans;
-	vector<int> v_event;
+	int vsize = t->Draw("particles.eta:particles.phi:particles.I:particles.KS","","goff");
+	static vector<int> v_I, v_KS, v_KF, v_ORIG;
+	static vector<double> v_phi, v_eta, v_mom;
+	static vector<double> v_px, v_py, v_pz, v_E, v_m;
+	static vector<double> v_trans;
+	static vector<int> v_event;
 	double I_old = 1000;
 	int event_total = 0;
 
-	int vsize = t->Draw("particles.eta:particles.phi:particles.I:particles.KS","","goff");
 	for (int i = 0; i < vsize; i++)
 	{
+
 		v_eta.push_back(t->GetV1()[i]);
 		v_phi.push_back(t->GetV2()[i]);
 		v_I.push_back(t->GetV3()[i]);
@@ -80,6 +81,7 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 		if(I_old > v_I[i]) event_total++;
 		I_old = v_I[i];
 		v_event.push_back(event_total);
+//		if((i % 1000 == 0) && (i > 999)) cout << i << " " << event_total <<  endl;
 	}
 	t->Draw("particles.id:particles.orig:particles.E:particles.px","","goff");
 	for (int i = 0; i < vsize; i++)
@@ -259,12 +261,12 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 		t2->Branch("pTrans",&v_d_trans);
 	t2->Fill();	
 
-	TH2F *h2  = new TH2F("h2","#Delta#eta vs. #Delta#phi",120,-1.5,1.5,120,-1.5,1.5);
+	TH2F *h2  = new TH2F("h2","#Delta#eta vs. #Delta#phi",120,-0.5,.5,120,-0.5,0.5);
 		h2->SetTitle("#Delta#eta vs. #Delta#phi for daughters of #tau from  e-p Leptoquark Events");
 		h2->GetXaxis()->SetTitle("#Delta#eta");
 		h2->GetYaxis()->SetTitle("#Delta#phi");
 		h2->GetZaxis()->SetTitle("Average Energy/Event");
-	t2->Draw("phi:eta>>h2","energy/10000","colz same");
+	t2->Draw("phi:eta>>h2","(energy<50)*(energy/14000)","colz same");
 	h2->Draw("colz");
 
 	c2->Update();

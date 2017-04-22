@@ -57,16 +57,16 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 	gStyle->SetOptStat(0);
 
 	std::string inputFile = "./outdir/TestOut.14000event.root";
-//	std::string inputFile = "./outdir/TestOut.100event.root";
+//	std::string inputFile = "./outdir/TestOut.1000event.root";
 	TFile *f = TFile::Open(inputFile.c_str());
 	TTree *t = (TTree*)f->Get("EICTree");
 
 	int vsize = t->Draw("particles.eta:particles.phi:particles.I:particles.KS","","goff");
-	static vector<int> v_I, v_KS, v_KF, v_ORIG;
-	static vector<double> v_phi, v_eta, v_mom;
-	static vector<double> v_px, v_py, v_pz, v_E, v_m;
-	static vector<double> v_trans;
-	static vector<int> v_event;
+	vector<int> v_I, v_KS, v_KF, v_ORIG;
+	vector<double> v_phi, v_eta, v_mom;
+	vector<double> v_px, v_py, v_pz, v_E, v_m;
+	vector<double> v_trans;
+	vector<int> v_event;
 	double I_old = 1000;
 	int event_total = 0;
 
@@ -109,7 +109,8 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 	//--------------------------------------------------------------------------------------------------------------
 	
 	int k;	
-	const int tau_code = 15;
+	const int tau_code = 15;	//tau daughters
+//	const int tau_code = 1;		//DIS particle daughters
 	const int exec_code = 21;
 	int mother_tau;
 	vector<int> v_daughters_I;
@@ -170,6 +171,7 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 	vector<int> v_d_I, v_d_KS, v_d_KF, v_d_ORIG;
 	vector<double> v_d_phi, v_d_eta, v_d_mom;
 	vector<double> v_d_DiffPhi, v_d_DiffEta;
+	vector<double> v_d_DiffTheta;
 	vector<double> v_d_px, v_d_py, v_d_pz, v_d_E, v_d_m;
 	vector<double> v_d_trans;
 	vector<int> v_d_event;
@@ -189,6 +191,7 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 				v_d_eta.push_back(v_eta[i]);		//eta of particle
 				v_d_phi.push_back(v_phi[i]);		//phi of particle
 				v_d_DiffEta.push_back(v_eta[i] - v_MotherTau_eta[j]);		//eta of particle - eta of tau
+				v_d_DiffTheta.push_back(2*TMath::ATan(TMath::Power(TMath::E(),(-1*v_eta[i]))) - 2*TMath::ATan(TMath::Power(TMath::E(),(-1*v_MotherTau_eta[j]))));		//theta of particle - theeta of tau
 				if((v_phi[i]*5 < v_MotherTau_phi[j]) && (v_MotherTau_phi[j] > 4) )
 				{
 					v_d_DiffPhi.push_back(2*TMath::Pi() + v_phi[i] - v_MotherTau_phi[j]);		//phi of particle - eta of tau
@@ -221,7 +224,7 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 	gStyle->SetStatX(0.4);
 	gStyle->SetStatW(0.2);
 	gStyle->SetStatH(0.2);
-
+/*
 	TCanvas *c1 = new TCanvas();
 	TH2F *h  = new TH2F("h","#Delta#eta vs. #Delta#phi",120,-1.5,1.5,120,-1.5,1.5);
 	for(int i = 0; (unsigned)i < v_d_eta.size(); i++)
@@ -236,15 +239,16 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 	c1->SetRightMargin(0.15);
 //	c1->Print("DeltaEta_vs_DeltaPhi.eps");
 //	c1->Print("DeltaEta_vs_DeltaPhi.root");
-	
+*/	
 	//--------------------------------------------------------------------------------------------------------------
 
 
 	TCanvas *c2 = new TCanvas();
 
 	TTree *t2 = new TTree("tvec","Tree with vectors of tau daughter particles");
-		t2->Branch("eta",&v_d_DiffEta);
-		t2->Branch("phi",&v_d_DiffPhi);
+		t2->Branch("DIFFeta",&v_d_DiffEta);
+		t2->Branch("DIFFphi",&v_d_DiffPhi);
+		t2->Branch("DIFFtheta",&v_d_DiffTheta);
 		t2->Branch("energy",&v_d_E);
 		t2->Branch("I",&v_d_I);
 		t2->Branch("KS",&v_d_KS);
@@ -261,15 +265,41 @@ int plot_LQGENEP_DiffEta_DiffPhi()
 		t2->Branch("pTrans",&v_d_trans);
 	t2->Fill();	
 
-	TH2F *h2  = new TH2F("h2","#Delta#eta vs. #Delta#phi",120,-0.5,.5,120,-0.5,0.5);
+	TH2F *h2  = new TH2F("h2","#Delta#eta vs. #Delta#phi",40,-1,1,40,-1,1);
 		h2->SetTitle("#Delta#eta vs. #Delta#phi for daughters of #tau from  e-p Leptoquark Events");
 		h2->GetXaxis()->SetTitle("#Delta#eta");
 		h2->GetYaxis()->SetTitle("#Delta#phi");
-		h2->GetZaxis()->SetTitle("Average Energy/Event");
-	t2->Draw("phi:eta>>h2","(energy<50)*(energy/14000)","colz same");
+		h2->GetZaxis()->SetTitle("Particles/Event");
+//		h2->SetMaximum(14);
+//	t2->Draw("DIFFphi:DIFFeta>>h2","(KF!=1)*(1/14000)","colz same");
+	t2->Draw("DIFFphi:DIFFeta>>h2","(KF!=15)*(1/14000)","colz same");
+//	t2->Draw("DIFFphi:DIFFeta>>h2","(KF!=15)*(energy/14000)","colz same");
+//	t2->Draw("DIFFphi:DIFFeta>>h2","(KF!=1)*(energy/14000)","colz same");
 	h2->Draw("colz");
 
 	c2->Update();
+
+	TCanvas *c3 = new TCanvas();
+	TH1D *h3 = h2->ProjectionX();
+	h3->Draw();
+
+	TCanvas *c4 = new TCanvas();
+	TH1D *h4 = h2->ProjectionY();
+	h4->Draw();
+
+	TCanvas *c5 = new TCanvas();
+	TH2F *h5  = new TH2F("h5","#Delta#theta vs. #Delta#phi",60,-0.5,0.5,60,-0.5,0.5);
+		h5->SetTitle("#Delta#theta vs. #Delta#phi for daughters of #tau from  e-p Leptoquark Events");
+		h5->GetXaxis()->SetTitle("#Delta#theta");
+		h5->GetYaxis()->SetTitle("#Delta#phi");
+		h5->GetZaxis()->SetTitle("Average Energy/Event");
+	t2->Draw("DIFFphi:DIFFtheta>>h5","(KF!=15)*(energy/14000)","colz same");
+	h5->Draw("colz");
+
+	TCanvas *c6 = new TCanvas();
+	TH1D *h6 = h5->ProjectionX();
+	h6->Draw();
+
 
 	f2->Write();
 	

@@ -31,6 +31,8 @@ TestOut_Distill()
 				{
 					fout << str << endl;
 				}
+				else if(KS == 21) 
+					{ fout << str << endl; }
 				else if(KF == tau_KF)
 				{
 					fout << str << endl;

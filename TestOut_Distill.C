@@ -33,7 +33,7 @@ TestOut_Distill()
 				}
 				else if(KS == 21) 
 					{ fout << str << endl; }
-				else if(KF == tau_KF)
+				else if(TMath::Abs(KF) == tau_KF)
 				{
 					fout << str << endl;
 					tau_orig.push_back(I);

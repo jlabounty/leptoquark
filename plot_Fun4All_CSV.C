@@ -1,0 +1,169 @@
+#include "TROOT.h"
+#include "TClass.h"
+#include "TGraph.h"
+#include "TF1.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "TH3F.h"
+#include "TH3D.h"
+#include "TTree.h"
+#include "TCanvas.h"
+#include "TBranch.h"
+#include "Riostream.h"
+#include "TStyle.h"
+#include "TFile.h"
+#include "TString.h"
+#include "TLegend.h"
+#include "TRandom3.h"
+#include "TMath.h"
+#include "math.h"
+#include "TColor.h"
+#include <vector>
+#include <sstream>
+#include <algorithm>
+
+#include <cstdlib>
+#include "TMath.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <math.h>
+#include <cmath>
+#include "TGraph.h"
+#include "TGraph2D.h"
+#include <algorithm>
+
+//AVERAGE
+double Average(vector<double> v)
+{
+	double sum=0;
+	for(int i=0;(unsigned)i<v.size();i++)
+	sum+=v[i];
+	return sum/v.size();
+}
+
+
+//WEIGHTED AVERAGE
+double Average(vector<double> v, vector<double> w)
+{
+	if(v.size() != w.size())
+	{
+		cerr << "ERROR in Average(v1, v2): Two vectors have different lengths" << endl;
+		return nan("");
+	}
+	double sum=0, sum_w = 0;
+	for(int i=0;(unsigned)i<v.size();i++)
+	{
+		sum+=(v[i]*w[i]);
+		sum_w += w[i];
+	}
+	return sum/sum_w;
+}
+
+//DEVIATION
+double Deviation(vector<double> v, double ave)
+{
+	double E=0;
+	for(int i=0;(unsigned)i<v.size();i++)
+	E+=(v[i] - ave)*(v[i] - ave);
+	return sqrt(1/static_cast<double>(v.size())*E);
+}
+
+int plot_Fun4All_CSV()
+{
+//	const std::string inFile = "LeptoAna_100events_tauOnly.root";
+//	const std::string inDirectory = "/direct/phenix+u/jlab/github/forks/macros/macros/g4simulations/";
+	const std::string inFile = "LeptoAna_100events_tauOnly.root";
+//	const std::string inFile = "LeptoAna_100events_DISonly.root";
+	const std::string inDirectory = "/gpfs/mnt/gpfs02/phenix/scratch/jlab/Leptoquark/";
+	std::string inputFile = inDirectory+inFile;
+
+	TFile *f = TFile::Open(inputFile.c_str());
+	TTree *t = (TTree*)f->Get("ntp_leptoquark");
+//	t->Print();
+
+	const int Nevent = t->GetMaximum("event");
+	cout << "Running " << Nevent << " events" << endl;
+	const int Nentries = t->Draw("towereta:towerphi:towerenergy:event","isMaxEnergyJet==1","goff");
+
+        ofstream myfile;
+        myfile.open("./tauJetSummary.csv");
+
+	myfile << "# " << "n_Total, n_Above_0p001, n_Above_0p01, n_Above_0p1, n_Above_1, n_Above_1, n_Above_10, eta_avg, eta_std, phi_avg, phi_std,"
+		<< " Delta_eta_avg, Delta_eta_std, Delta_phi_avg, Delta_phi_std, Delta_eta_avg_w, Delta_eta_std_w, Delta_phi_avg_w,"
+		<< " Delta_phi_std_w, towerenergy_sum" << endl;
+
+	for(int i = 1; i < Nevent+1; i++)
+	{
+		vector<double> v_DeltaEta, v_DeltaPhi, v_DeltaTheta;
+		vector<double> v_Eta, v_Phi, v_TowerEnergy;
+		int n_Above_0p001 = 0, n_Above_0p01 = 0, n_Above_0p1 = 0, n_Above_1 = 0, n_Above_10 = 0, n_Total = 0;
+		double tower_energy_sum = 0;
+
+		double Emax = 0;
+		int Emax_i = 0;
+		for(int j = 0; j < Nentries; j++)
+		{
+			if(t->GetV4()[j] == i)
+			{
+				n_Total++;
+				tower_energy_sum = tower_energy_sum + t->GetV3()[j];
+				if(t->GetV3()[j] > 0.001) n_Above_0p001++;
+				if(t->GetV3()[j] > 0.01) n_Above_0p01++;
+				if(t->GetV3()[j] > 0.1) n_Above_0p1++;
+				if(t->GetV3()[j] > 1.0) n_Above_1++;
+				if(t->GetV3()[j] > 10.0) n_Above_10++;
+				if(t->GetV3()[j] > Emax) 
+				{
+					Emax = t->GetV3()[j];
+					Emax_i = j;
+				}
+			}
+		}
+//		cout << "Maximum energy tower for event " << i << " is " << Emax_i << endl;
+
+		for(int j = 0; j < Nentries; j++)
+		{
+			if(t->GetV4()[j] == i)
+			{
+				v_Eta.push_back(t->GetV1()[j]);
+				v_Phi.push_back(t->GetV2()[j]);
+				v_DeltaEta.push_back(t->GetV1()[j] - t->GetV1()[Emax_i]);
+				v_DeltaTheta.push_back(2*TMath::ATan(TMath::Power(TMath::E(),-1*t->GetV1()[j])) - 2*TMath::ATan(TMath::Power(TMath::E(),-1*t->GetV1()[Emax_i])));
+				v_DeltaPhi.push_back(t->GetV2()[j] - t->GetV2()[Emax_i]);
+				v_TowerEnergy.push_back(t->GetV3()[j]);
+			}
+		}
+
+	double eta_average = Average(v_Eta);
+	double eta_std = Deviation(v_Eta, eta_average);
+	double phi_average = Average(v_Phi);
+	double phi_std = Deviation(v_Phi, phi_average);
+
+	double Delta_eta_average = Average(v_DeltaEta);
+	double Delta_eta_std = Deviation(v_DeltaEta, Delta_eta_average);
+	double Delta_phi_average = Average(v_DeltaPhi);
+	double Delta_phi_std = Deviation(v_DeltaPhi, Delta_phi_average);
+
+	double Delta_eta_average_weighted = Average(v_DeltaEta,v_TowerEnergy);
+	double Delta_eta_std_weighted = Deviation(v_DeltaEta, Delta_eta_average_weighted);
+	double Delta_phi_average_weighted = Average(v_DeltaPhi,v_TowerEnergy);
+	double Delta_phi_std_weighted = Deviation(v_DeltaPhi, Delta_phi_average_weighted);
+
+	myfile	<< n_Total << ", " << n_Above_0p001 << ", " << n_Above_0p01 << ", " << n_Above_0p1 << ", " << n_Above_1 << ", " << n_Above_10 << ", " << eta_average << ", "
+		<< eta_std << ", " << phi_average << ", " << phi_std  << ", " << Delta_eta_average << ", " << Delta_eta_std << ", " << Delta_phi_average << ", " 
+		<< Delta_phi_std << ", " << Delta_eta_average_weighted << ", " << Delta_eta_std_weighted << ", " << Delta_phi_average_weighted << ", " 
+		<< Delta_phi_std_weighted << ", " << tower_energy_sum << endl;
+
+	}
+
+
+//-----------------------------------------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------------------------------------
+
+
+	return 0;
+}

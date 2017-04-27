@@ -12,11 +12,15 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
+from pandas.tools.plotting import andrews_curves
+from pandas.tools.plotting import parallel_coordinates
+from pandas.tools.plotting import radviz
+import seaborn as sns
 
 # Load dataset
 #url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
 #names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
-path = "./JetSummary_Combined.csv"
+path = "./data/JetSummary_Combined.csv"
 names = ['n_Total', 'n_Above_0p001', 'n_Above_0p01', 'n_Above_0p1', 'n_Above_1', 'n_Above_10', 'eta_avg', 'eta_std', 'phi_avg', 'phi_std', 'Delta_eta_avg', 'Delta_eta_std', 'Delta_phi_avg', 'Delta_phi_std', 'Delta_eta_avg_w', 'Delta_eta_std_w', 'Delta_phi_avg_w', 'Delta_phi_std_w', 'towerenergy_sum','class']
 dataset = pandas.read_csv(path, names=names)
 
@@ -26,8 +30,11 @@ print(dataset.shape)
 # head
 #print(dataset.head(20))
 
-# descriptions
+# descriptions and visualizations
 print(dataset.describe())
+#andrews_curves(dataset, 'class')
+#parallel_coordinates(dataset, 'class')
+#radviz(dataset, 'class')
 
 # class distribution
 #print(dataset.groupby('class').size())
@@ -41,8 +48,9 @@ print(dataset.describe())
 #plt.show()
 
 # scatter plot matrix
-#scatter_matrix(dataset)
-#plt.show()
+sns.pairplot(dataset, hue="class")
+plt.show()
+plt.savefig('destination_path.eps', format='eps', dpi=1000)
 
 # Split-out validation dataset
 array = dataset.values
@@ -92,4 +100,4 @@ print(accuracy_score(Y_validation, predictions))
 print(confusion_matrix(Y_validation, predictions))
 print(classification_report(Y_validation, predictions))
 
-plt.show()
+#plt.show()

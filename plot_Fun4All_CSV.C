@@ -73,8 +73,8 @@ int plot_Fun4All_CSV()
 {
 //	const std::string inFile = "LeptoAna_100events_tauOnly.root";
 //	const std::string inDirectory = "/direct/phenix+u/jlab/github/forks/macros/macros/g4simulations/";
-	const std::string inFile = "LeptoAna_100events_tauOnly.root";
-//	const std::string inFile = "LeptoAna_100events_DISonly.root";
+//	const std::string inFile = "LeptoAna_100events_tauOnly.root";
+	const std::string inFile = "LeptoAna_100events_DISonly.root";
 	const std::string inDirectory = "/gpfs/mnt/gpfs02/phenix/scratch/jlab/Leptoquark/";
 	std::string inputFile = inDirectory+inFile;
 
@@ -87,25 +87,31 @@ int plot_Fun4All_CSV()
 	const int Nentries = t->Draw("towereta:towerphi:towerenergy:event","isMaxEnergyJet==1","goff");
 
         ofstream myfile;
-        myfile.open("./tauJetSummary.csv");
+        myfile.open("./DISJetSummary.csv");
 
+	//output what each of the variables in the csv file will contain"
 	myfile << "# " << "n_Total, n_Above_0p001, n_Above_0p01, n_Above_0p1, n_Above_1, n_Above_1, n_Above_10, eta_avg, eta_std, phi_avg, phi_std,"
 		<< " Delta_eta_avg, Delta_eta_std, Delta_phi_avg, Delta_phi_std, Delta_eta_avg_w, Delta_eta_std_w, Delta_phi_avg_w,"
 		<< " Delta_phi_std_w, towerenergy_sum" << endl;
 
+	//loop over all events
 	for(int i = 1; i < Nevent+1; i++)
 	{
-		vector<double> v_DeltaEta, v_DeltaPhi, v_DeltaTheta;
-		vector<double> v_Eta, v_Phi, v_TowerEnergy;
-		int n_Above_0p001 = 0, n_Above_0p01 = 0, n_Above_0p1 = 0, n_Above_1 = 0, n_Above_10 = 0, n_Total = 0;
-		double tower_energy_sum = 0;
+		vector<double> v_DeltaEta, v_DeltaPhi, v_DeltaTheta; 	//vectors which store the differece in eta/phi/theta from the parent tau/quark
+		vector<double> v_Eta, v_Phi, v_TowerEnergy;		//vectors which store absolute eta/phi/theta values
+		int n_Above_0p001 = 0, n_Above_0p01 = 0, n_Above_0p1 = 0, n_Above_1 = 0, n_Above_10 = 0, n_Total = 0;	//counters for the number of events above 
+															//	a certain energy threshod in an event. 0p001 -> 0.001
+		double tower_energy_sum = 0;				//rolling sum of all the energy in a jet.
 
 		double Emax = 0;
 		int Emax_i = 0;
+
+		//loop over all entries in t->Draw()
 		for(int j = 0; j < Nentries; j++)
 		{
 			if(t->GetV4()[j] == i)
 			{
+				//increment counters depending on energy level
 				n_Total++;
 				tower_energy_sum = tower_energy_sum + t->GetV3()[j];
 				if(t->GetV3()[j] > 0.001) n_Above_0p001++;
@@ -135,34 +141,31 @@ int plot_Fun4All_CSV()
 			}
 		}
 
+	//compute standard deviations and averages of raw values
 	double eta_average = Average(v_Eta);
 	double eta_std = Deviation(v_Eta, eta_average);
 	double phi_average = Average(v_Phi);
 	double phi_std = Deviation(v_Phi, phi_average);
 
+	//avg/std of the difference from tau/quark
 	double Delta_eta_average = Average(v_DeltaEta);
 	double Delta_eta_std = Deviation(v_DeltaEta, Delta_eta_average);
 	double Delta_phi_average = Average(v_DeltaPhi);
 	double Delta_phi_std = Deviation(v_DeltaPhi, Delta_phi_average);
 
+	//avg/std of difference from parent quark, but weighted by energy
 	double Delta_eta_average_weighted = Average(v_DeltaEta,v_TowerEnergy);
 	double Delta_eta_std_weighted = Deviation(v_DeltaEta, Delta_eta_average_weighted);
 	double Delta_phi_average_weighted = Average(v_DeltaPhi,v_TowerEnergy);
 	double Delta_phi_std_weighted = Deviation(v_DeltaPhi, Delta_phi_average_weighted);
 
+	//output to the csv file
 	myfile	<< n_Total << ", " << n_Above_0p001 << ", " << n_Above_0p01 << ", " << n_Above_0p1 << ", " << n_Above_1 << ", " << n_Above_10 << ", " << eta_average << ", "
 		<< eta_std << ", " << phi_average << ", " << phi_std  << ", " << Delta_eta_average << ", " << Delta_eta_std << ", " << Delta_phi_average << ", " 
 		<< Delta_phi_std << ", " << Delta_eta_average_weighted << ", " << Delta_eta_std_weighted << ", " << Delta_phi_average_weighted << ", " 
 		<< Delta_phi_std_weighted << ", " << tower_energy_sum << endl;
 
 	}
-
-
-//-----------------------------------------------------------------------------------------------------------
-
-
-
-//-----------------------------------------------------------------------------------------------------------
 
 
 	return 0;

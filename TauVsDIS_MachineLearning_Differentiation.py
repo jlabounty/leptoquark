@@ -6,12 +6,22 @@ from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, RidgeClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.neural_network import MLPClassifier
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
 from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, ExtraTreesClassifier
+from sklearn.cluster import SpectralClustering
+from sklearn.mixture import GaussianMixture
+from sklearn.cluster import KMeans
+from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
+from sklearn.calibration import CalibratedClassifierCV
 from pandas.tools.plotting import andrews_curves
 from pandas.tools.plotting import parallel_coordinates
 from pandas.tools.plotting import radviz
@@ -20,7 +30,7 @@ import seaborn as sns
 # Load dataset
 #url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
 #names = ['sepal-length', 'sepal-width', 'petal-length', 'petal-width', 'class']
-path = "./data/JetSummary_Combined.csv"
+path = "./data/JetSummary_Combined_1000.csv"
 names = ['n_Total', 'n_Above_0p001', 'n_Above_0p01', 'n_Above_0p1', 'n_Above_1', 'n_Above_10', 'eta_avg', 'eta_std', 'phi_avg', 'phi_std', 'Delta_eta_avg', 'Delta_eta_std', 'Delta_phi_avg', 'Delta_phi_std', 'Delta_eta_avg_w', 'Delta_eta_std_w', 'Delta_phi_avg_w', 'Delta_phi_std_w', 'towerenergy_sum','class']
 dataset = pandas.read_csv(path, names=names)
 
@@ -48,9 +58,9 @@ print(dataset.describe())
 #plt.show()
 
 # scatter plot matrix
-sns.pairplot(dataset, hue="class")
-plt.show()
-plt.savefig('destination_path.eps', format='eps', dpi=1000)
+#sns.pairplot(dataset, hue="class")
+#plt.show()
+#plt.savefig('destination_path.eps', format='eps', dpi=1000)
 
 # Split-out validation dataset
 array = dataset.values
@@ -60,7 +70,7 @@ validation_size = 0.20
 seed = 7
 X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
 
-print(X_train)
+#print(X_train)
 
 # Test options and evaluation metric
 seed = 7
@@ -70,10 +80,26 @@ scoring = 'accuracy'
 models = []
 models.append(('LR', LogisticRegression()))
 models.append(('LDA', LinearDiscriminantAnalysis()))
+#models.append(('QDA', QuadraticDiscriminantAnalysis()))
 models.append(('KNN', KNeighborsClassifier()))
 models.append(('CART', DecisionTreeClassifier()))
-models.append(('NB', GaussianNB()))
-models.append(('SVM', SVC()))
+models.append(('GNB', GaussianNB()))
+#models.append(('SVM', SVC()))
+models.append(('SVMlin', SVC(kernel="linear", C=0.025)))
+#models.append(('SVMpoly', SVC(kernel="poly")))
+#models.append(('SVMg2', SVC(gamma=2, C=1)))
+#models.append(('Neural', MLPClassifier()))
+models.append(('RFC', RandomForestClassifier()))
+models.append(('ADA', AdaBoostClassifier()))
+models.append(('EXT', ExtraTreesClassifier()))
+models.append(('RC', RidgeClassifier()))
+models.append(('RNeigh', RadiusNeighborsClassifier(200)))
+models.append(('ccCV', CalibratedClassifierCV()))
+models.append(('DTC', DecisionTreeClassifier()))
+models.append(('ETC', ExtraTreeClassifier()))
+
+
+
 # evaluate each model in turn
 results = []
 names = []
@@ -100,4 +126,4 @@ print(accuracy_score(Y_validation, predictions))
 print(confusion_matrix(Y_validation, predictions))
 print(classification_report(Y_validation, predictions))
 
-#plt.show()
+plt.show()

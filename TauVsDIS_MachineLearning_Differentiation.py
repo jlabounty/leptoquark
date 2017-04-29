@@ -26,6 +26,7 @@ from pandas.tools.plotting import andrews_curves
 from pandas.tools.plotting import parallel_coordinates
 from pandas.tools.plotting import radviz
 import seaborn as sns
+import numpy as np
 
 # Load dataset
 #url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
@@ -35,13 +36,13 @@ names = ['n_Total', 'n_Above_0p001', 'n_Above_0p01', 'n_Above_0p1', 'n_Above_1',
 dataset = pandas.read_csv(path, names=names)
 
 # shape
-print(dataset.shape)
+#print((dataset.shape)[0])
 
 # head
 #print(dataset.head(20))
 
 # descriptions and visualizations
-print(dataset.describe())
+#print(dataset.describe())
 #andrews_curves(dataset, 'class')
 #parallel_coordinates(dataset, 'class')
 #radviz(dataset, 'class')
@@ -70,7 +71,15 @@ validation_size = 0.20
 seed = 7
 X_train, X_validation, Y_train, Y_validation = model_selection.train_test_split(X, Y, test_size=validation_size, random_state=seed)
 
-#print(X_train)
+ding = np.column_stack((X_train,Y_train))
+print(ding)
+print(ding.dtype)
+dong = np.column_stack((X_validation,Y_validation))
+
+#np.savetxt("./data/JetSummary_1000_training.csv", ding, delimiter=", ")
+np.savetxt("./data/JetSummary_1000_validation.csv", dong, fmt='%i, %i, %i, %i, %i, %i, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %s')
+np.savetxt("./data/JetSummary_1000_training.csv", ding, fmt='%i, %i, %i, %i, %i, %i, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %s')
+
 
 # Test options and evaluation metric
 seed = 7

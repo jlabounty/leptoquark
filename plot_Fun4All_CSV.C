@@ -71,10 +71,18 @@ double Deviation(vector<double> v, double ave)
 
 int plot_Fun4All_CSV()
 {
+        ofstream myfile;
 //	const std::string inFile = "LeptoAna_100events_tauOnly.root";
 //	const std::string inDirectory = "/direct/phenix+u/jlab/github/forks/macros/macros/g4simulations/";
-//	const std::string inFile = "LeptoAna_100events_tauOnly.root";
-	const std::string inFile = "LeptoAna_100events_DISonly.root";
+//	const std::string inFile = "LeptoAna_1000events_tauOnly.root";	const std::string class_string = "tau"; myfile.open("./tauJetSummary_1000.csv");
+//	const std::string inFile = "LeptoAna_100events_DISonly.root";	const std::string class_string = "DIS"; myfile.open("./tauJetSummary_100.csv");
+//	const std::string inFile = "LeptoAna_1000events_DISonly.root";	const std::string class_string = "DIS"; myfile.open("./DISJetSummary_1000.csv");
+//	const std::string inFile = "LeptoAna_1000events_DISonly_30_50.root";	const std::string class_string = "DIS"; myfile.open("./data/DISJetSummary_1000_30_50.csv");
+//	const std::string inFile = "LeptoAna_1000events_tauOnly_30_50.root";	const std::string class_string = "tau"; myfile.open("./data/tauJetSummary_1000_30_50.csv");
+	const std::string inFile = "LeptoAna_1000events_DISonly_5_275.root";	const std::string class_string = "DIS"; myfile.open("./data/DISJetSummary_1000_5_275_small.csv");
+//	const std::string inFile = "LeptoAna_1000events_tauOnly_5_275.root";	const std::string class_string = "tau"; myfile.open("./data/tauJetSummary_1000_5_275_small.csv");
+//	const std::string inFile = "LeptoAna_1000events_tauOnly_30_275.root";	const std::string class_string = "tau"; myfile.open("./data/tauJetSummary_1000_30_275_small.csv");
+
 	const std::string inDirectory = "/gpfs/mnt/gpfs02/phenix/scratch/jlab/Leptoquark/";
 	std::string inputFile = inDirectory+inFile;
 
@@ -86,13 +94,12 @@ int plot_Fun4All_CSV()
 	cout << "Running " << Nevent << " events" << endl;
 	const int Nentries = t->Draw("towereta:towerphi:towerenergy:event","isMaxEnergyJet==1","goff");
 
-        ofstream myfile;
-        myfile.open("./DISJetSummary.csv");
+        
 
 	//output what each of the variables in the csv file will contain"
-	myfile << "# " << "n_Total, n_Above_0p001, n_Above_0p01, n_Above_0p1, n_Above_1, n_Above_1, n_Above_10, eta_avg, eta_std, phi_avg, phi_std,"
-		<< " Delta_eta_avg, Delta_eta_std, Delta_phi_avg, Delta_phi_std, Delta_eta_avg_w, Delta_eta_std_w, Delta_phi_avg_w,"
-		<< " Delta_phi_std_w, towerenergy_sum" << endl;
+//	myfile << "# " << "n_Total, n_Above_0p001, n_Above_0p01, n_Above_0p1, n_Above_1, n_Above_1, n_Above_10, eta_avg, eta_std, phi_avg, phi_std,"
+//		<< " Delta_eta_avg, Delta_eta_std, Delta_phi_avg, Delta_phi_std, Delta_eta_avg_w, Delta_eta_std_w, Delta_phi_avg_w,"
+//		<< " Delta_phi_std_w, towerenergy_sum" << endl;
 
 	//loop over all events
 	for(int i = 1; i < Nevent+1; i++)
@@ -160,10 +167,12 @@ int plot_Fun4All_CSV()
 	double Delta_phi_std_weighted = Deviation(v_DeltaPhi, Delta_phi_average_weighted);
 
 	//output to the csv file
-	myfile	<< n_Total << ", " << n_Above_0p001 << ", " << n_Above_0p01 << ", " << n_Above_0p1 << ", " << n_Above_1 << ", " << n_Above_10 << ", " << eta_average << ", "
-		<< eta_std << ", " << phi_average << ", " << phi_std  << ", " << Delta_eta_average << ", " << Delta_eta_std << ", " << Delta_phi_average << ", " 
-		<< Delta_phi_std << ", " << Delta_eta_average_weighted << ", " << Delta_eta_std_weighted << ", " << Delta_phi_average_weighted << ", " 
-		<< Delta_phi_std_weighted << ", " << tower_energy_sum << endl;
+//	myfile	<< n_Total << ", " << n_Above_0p001 << ", " << n_Above_0p01 << ", " << n_Above_0p1 << ", " << n_Above_1 << ", " << n_Above_10 << ", " << eta_average << ", "
+//		<< eta_std << ", " << phi_average << ", " << phi_std  << ", " << Delta_eta_average << ", " << Delta_eta_std << ", " << Delta_phi_average << ", " 
+//		<< Delta_phi_std << ", " << Delta_eta_average_weighted << ", " << Delta_eta_std_weighted << ", " << Delta_phi_average_weighted << ", " 
+//		<< Delta_phi_std_weighted << ", " << tower_energy_sum << ", " << class_string << endl;
+        myfile  << n_Total << ", " << n_Above_1 << ", " << n_Above_10 << ", " << Delta_eta_average_weighted << ", " << Delta_eta_std_weighted << ", " 
+		<< Delta_phi_average_weighted << ", " << Delta_phi_std_weighted << ", " << tower_energy_sum << ", " << class_string << endl; 
 
 	}
 

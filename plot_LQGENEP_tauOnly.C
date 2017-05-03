@@ -80,6 +80,25 @@ int plot_LQGENEP_tauOnly()
 	c4->Update();
 
 	//-----------------------------------------------------------------------------------------------------------
+	
+	std::string title5 = "";
+//	std::string title5 = "#eta vs. #phi for #tau^{-} produced in LQ Events";
+	TCanvas *c5 = new TCanvas();
+	TH2D *h5 = new TH2D("h5",title5.c_str(),50,xmin,xmax,75,0,250);
+	for(int i = 0; i < vsize; i++)
+	{
+		h5->Fill(t->GetV1()[i],t->GetV4()[i]);
+	}
+	h5->Draw("colz");
+//		h5->SetMinimum(0);
+		h5->SetMaximum(63000);
+		h5->GetXaxis()->SetTitle("#eta");
+		h5->GetYaxis()->SetTitle("p_{total} (GeV)");
+		h5->GetYaxis()->SetTitleOffset(1.4);
+		c5->SetLogz();
+	c5->Update();
+
+	//-----------------------------------------------------------------------------------------------------------
 /*
 	TCanvas *c3 = new TCanvas();
 		c3->SetGridx();
